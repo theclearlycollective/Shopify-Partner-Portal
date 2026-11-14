@@ -65,7 +65,7 @@ To limit the portal to approved partners:
 ## 6. Still to fill in (in `js/config.js`)
 
 - `drops[].date`: the Dallas and Chicago dates. The photos and pieces come from Shopify automatically.
-- `collector.howToEarn`: how a partner earns collector status. The benefits line already uses your Collectors' Circle wording. The section stays hidden for real buyers until this is filled in.
+- `collector`: the three collector tiers (Studio, Atelier, Keystone) are a proposal. Confirm the names, the Atelier threshold (`atelierMinOrders` and/or `atelierMinSpend`) and the benefits. To make a partner Keystone, add a customer metafield `portal.tier` (single-line text) in Shopify with the value `keystone`, with customer account access turned on.
 - `semiCustom`: uses the wording, minimum and timeline from your website's Semi-Custom page. Change it if wholesale partners get different terms.
 - `offers`: wording, dates and photos.
 - `wholesaleDiscountCode`: see the pricing note below.

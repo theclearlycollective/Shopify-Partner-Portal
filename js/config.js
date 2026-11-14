@@ -67,13 +67,39 @@ window.PORTAL_CONFIG = {
     url: 'https://www.theclearlycollective.com/pages/semi-custom-catalog#order'
   },
 
-  // Collector status. Hidden for real buyers until howToEarn and benefits are
-  // filled in. ordersNeeded drives the progress line.
+  // Collector status tiers (PROPOSAL: confirm names, thresholds and benefits).
+  // A partner's tier is worked out from shipped orders in the last 12 months:
+  // they reach Atelier with atelierMinOrders orders OR atelierMinSpend dollars.
+  // Keystone is by invitation: set it per partner with the customer metafield
+  // below (value "keystone"). Leave a threshold as null to ignore it.
   collector: {
-    ordersNeeded: null, // TO CONFIRM, e.g. 3
-    howToEarn: '',      // TO CONFIRM: not stated anywhere on the website
-    // From the Collectors' Circle page on your website.
-    benefits: 'Early releases, archive exclusives and concierge perks.'
+    atelierMinOrders: 3,
+    atelierMinSpend: null,   // TO CONFIRM, e.g. 10000
+    keystoneSpendHint: null, // TO CONFIRM, shown as a guide only, e.g. 25000
+    tierMetafield: { namespace: 'portal', key: 'tier' },
+    tiers: [
+      { id: 'studio', name: 'Studio Partner',
+        requirement: 'Approved, with a first order placed',
+        benefits: ['Order window opens 7 days before public launch', 'Standard allocation on limited runs',
+          'Semi-custom on standard terms (10-piece minimum, 6–8 weeks)', 'Listed on our Store Locator'] },
+      { id: 'atelier', name: 'Atelier Partner',
+        requirement: '3+ orders in the last 12 months',
+        benefits: ['Order window opens 2–3 weeks before launch', 'Priority allocation on limited runs',
+          'Reorder from the Archive of retired prints', 'Reduced semi-custom minimum',
+          'Lower free-freight threshold', 'Seasonal feature on our social channels', 'Input on our next destination design'] },
+      { id: 'keystone', name: 'Keystone Partner',
+        requirement: 'By invitation from our team',
+        benefits: ['Line sheet preview before production, with reserved allocation',
+          'First look at prints before they retire to the Archive',
+          'An exclusive design or colorway for your store or city', 'An in-store event or trunk show with Olivia',
+          'Payment terms and a dedicated contact', 'Named founding stockist of new city designs'] }
+    ],
+    rules: [
+      'Your tier is based on shipped orders over the last 12 months.',
+      'Once you reach a tier, you keep it for 12 months, even if a season is slower.',
+      'Keystone partners are invited by our team.',
+      'Benefits apply from your next order after you reach a tier.'
+    ]
   },
 
   newsletter: {

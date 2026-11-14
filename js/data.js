@@ -28,6 +28,11 @@
       }
     }`;
 
+  const TIER_QUERY = `
+    query Tier($ns: String!, $key: String!) {
+      customer { metafield(namespace: $ns, key: $key) { value } }
+    }`;
+
   const APPROVAL_QUERY = `
     query Approval($ns: String!, $key: String!) {
       customer { metafield(namespace: $ns, key: $key) { value } }
@@ -76,6 +81,12 @@
       const a = await customerApi(APPROVAL_QUERY, { ns: C.approval.namespace, key: C.approval.key });
       approved = !!(a.customer.metafield && String(a.customer.metafield.value).toLowerCase() === 'true');
     }
+    let tierOverride = null;
+    try {
+      const m = C.collector.tierMetafield;
+      const t = await customerApi(TIER_QUERY, { ns: m.namespace, key: m.key });
+      tierOverride = t.customer.metafield ? String(t.customer.metafield.value).toLowerCase() : null;
+    } catch (e) { console.warn('Tier metafield not readable', e); }
     const addr = c.defaultAddress || {};
     const orders = c.orders.nodes.map(shapeOrder).sort((a, b) => new Date(b.date) - new Date(a.date));
     return {
@@ -83,7 +94,7 @@
       company: addr.company || [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Your shop',
       place: [addr.city, addr.zoneCode].filter(Boolean).join(', '),
       email: c.emailAddress ? c.emailAddress.emailAddress : '',
-      orders
+      orders, tierOverride
     };
   }
 

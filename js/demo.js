@@ -19,13 +19,13 @@
   }
   window.PORTAL_DEMO = {
     buyer: () => ({
-      approved: true, company: 'Sample Boutique', place: 'Charleston, SC', email: 'buyer@example.com',
+      approved: true, tierOverride: null, company: 'Sample Boutique', place: 'Charleston, SC', email: 'buyer@example.com',
       orders: [
         order('#1042', 3, [line(P.dalScarf, 12, 92.5), line(P.dalRibbon, 12, 32.5)], 'Processing'),
         order('#1037', 6, [line(P.chs, 12, 77.5), line(P.dalWrap, 4, 162.5)], 'Shipped',
           [{ company: 'UPS', number: '1Z0000417000', url: '' }]),
-        order('#1021', 40, [line(P.chs, 24, 77.5)], 'Fulfilled'),
-        order('#0988', 84, [line(P.chs, 12, 77.5), line(P.dalRibbon, 6, 32.5)], 'Fulfilled')
+        order('#1021', 400, [line(P.chs, 24, 77.5)], 'Fulfilled'),
+        order('#0988', 460, [line(P.chs, 12, 77.5), line(P.dalRibbon, 6, 32.5)], 'Fulfilled')
       ]
     }),
     drops: () => ([

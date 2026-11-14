@@ -18,7 +18,7 @@
     return '<div class="c"><div class="logo">' + esc(C.shop.name) + '</div><div class="sub">Retail Partners</div></div>';
   }
   function header(active) {
-    const tabs = [['Home', '#/home'], ['Orders', '#/orders'], ['Offers', '#/offers'], ['Questions', '#/faq']];
+    const tabs = [['Home', '#/home'], ['Orders', '#/orders'], ['Collector Status', '#/collector'], ['Offers', '#/offers'], ['Questions', '#/faq']];
     return (C.demoMode ? '<div class="demo">Preview with sample orders. Set demoMode to false in js/config.js to go live.</div>' : '') +
       brand() +
       '<div class="topbar"><span>' + esc(state.buyer.email) + '</span><button type="button" class="linkish" data-act="signout">Sign out</button></div>' +
@@ -52,14 +52,42 @@
     return '<div class="duo"><div class="cta"><p class="eye c">Ready for more?</p><h2 class="h2">Place a new order</h2><div><a class="btn" href="' + esc(C.orderFormUrl) + '" target="_blank" rel="noopener">Order on the wholesale form</a></div></div>' +
       '<div class="cta alt"><p class="eye c">Semi-custom</p><h2 class="h2">' + esc(s.title) + '</h2>' + (s.text ? '<p class="note">' + esc(s.text) + '</p>' : (C.demoMode ? '<p class="tbc">Text to confirm in config.js</p>' : '')) + (s.url ? '<div><a class="btn g" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.buttonLabel) + '</a></div>' : '') + '</div></div>';
   }
-  function collector() {
-    const c = C.collector;
-    const ready = c.howToEarn && c.benefits;
-    if (!ready && !C.demoMode) return '';
-    const n = state.buyer.orders.length;
-    let line = 'Collector status';
-    if (c.ordersNeeded) line = n >= c.ordersNeeded ? 'You are a Collector' : 'You are ' + (c.ordersNeeded - n) + ' order' + (c.ordersNeeded - n === 1 ? '' : 's') + ' away from Collector';
-    return '<div class="col"><p class="eye">Collector status</p>' + (ready ? '' : '<p class="tbc">Rules and benefits to confirm in config.js</p>') + '<h2 class="h2">' + esc(line) + '</h2><div class="grid"><div><h4>How you get there</h4><p class="note">' + esc(c.howToEarn || '—') + '</p></div><div><h4>What it includes</h4><p class="note">' + esc(c.benefits || '—') + '</p></div></div></div>';
+  // ---------- collector tiers ----------
+  function tierInfo() {
+    const c = C.collector, b = state.buyer;
+    const yearAgo = Date.now() - 365 * 864e5;
+    const recent = b.orders.filter(o => new Date(o.date) >= yearAgo && o.status !== 'Processing');
+    const count = recent.length;
+    const spend = recent.reduce((n, o) => n + Number(o.total ? o.total.amount : 0), 0);
+    const byId = id => c.tiers.find(t => t.id === id);
+    let id = 'studio';
+    if (b.tierOverride && byId(b.tierOverride)) id = b.tierOverride;
+    else if ((c.atelierMinOrders && count >= c.atelierMinOrders) || (c.atelierMinSpend && spend >= c.atelierMinSpend)) id = 'atelier';
+    const idx = c.tiers.findIndex(t => t.id === id);
+    const tier = c.tiers[idx], next = c.tiers[idx + 1] || null;
+    let filled = 3, line = 'Our highest tier. Thank you for being a Keystone partner.';
+    if (id === 'studio') {
+      const need = c.atelierMinOrders || 0;
+      filled = need ? Math.min(count, need) : 0;
+      const left = need - count;
+      const parts = [];
+      if (need) parts.push(left + ' more shipped order' + (left === 1 ? '' : 's'));
+      if (c.atelierMinSpend) parts.push(money({ amount: Math.max(c.atelierMinSpend - spend, 0), currencyCode: 'USD' }) + ' more in orders');
+      line = (parts.length ? parts.join(' or ') : 'A little more') + ' to reach ' + next.name.replace(' Partner', '');
+      return { tier, next, count, spend, segments: need || 3, filled, line };
+    }
+    if (id === 'atelier') line = 'Keystone partners are invited by our team' + (c.keystoneSpendHint ? ', usually after ' + money({ amount: c.keystoneSpendHint, currencyCode: 'USD' }) + ' in a year' : '') + '.';
+    return { tier, next, count, spend, segments: 3, filled, line };
+  }
+  function progressBar(t) {
+    let bars = '';
+    for (let i = 0; i < t.segments; i++) bars += '<div class="seg' + (i < t.filled ? ' on' : '') + '"></div>';
+    return '<div class="bar" role="img" aria-label="' + t.filled + ' of ' + t.segments + ' toward the next tier" style="grid-template-columns:repeat(' + t.segments + ',minmax(0,1fr))">' + bars + '</div>';
+  }
+  function statusCard() {
+    const t = tierInfo();
+    return '<div class="status"><p class="eye">Collector status</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) +
+      '<p class="note">' + esc(t.line) + '</p><div class="links"><a class="link" href="#/collector">Your benefits</a><a class="link" href="#/collector/how">How tiers work</a></div></div>';
   }
   function newsletter() {
     return '<form class="news" id="news"><p class="eye c">Partner newsletter</p><h2 class="h2 c">Hear about what matters to your shop</h2><p class="note">Choose what you want to hear about.</p><div class="opts">' +
@@ -70,22 +98,33 @@
   // ---------- pages ----------
   const pages = {
     home() {
-      const b = state.buyer, open = ordersIn(), past = ordersPast();
+      const b = state.buyer, open = ordersIn();
       const last = b.orders[0];
       const featured = C.offers.find(o => o.featured);
-      return header('Home') + '<p class="eye c">Welcome back</p><h1 class="h1 tight">' + esc(b.company) + '</h1><p class="partner">Exclusive partner of The Clearly Collective</p>' + (b.place ? '<p class="lede">' + esc(b.place) + '</p>' : '') +
+      return header('Home') + '<div class="hero"><div class="who"><p class="eye">Welcome back</p><h1 class="h1 left">' + esc(b.company) + '</h1><p class="partner left">Exclusive partner of The Clearly Collective</p>' + (b.place ? '<p class="place">' + esc(b.place) + '</p>' : '') + '</div>' + statusCard() + '</div>' +
         '<dl class="facts"><div><dt>Open orders</dt><dd>' + open.length + '</dd></div><div><dt>Last order</dt><dd>' + (last ? date(last.date) : '—') + '</dd></div><div><dt>Orders to date</dt><dd>' + b.orders.length + '</dd></div></dl>' +
         '<div class="gap">' + dropsSection() + '</div>' +
         '<h3 class="h3">In progress</h3>' + (open.length ? open.map(orderRow).join('') : '<p class="note">No open orders right now.</p>') +
-        duo() + collector() +
-        (past.length ? '<h3 class="h3">Buy again</h3>' + past.slice(0, 2).map(pastRow).join('') : '') +
+        duo() +
         (featured ? '<h3 class="h3">For you</h3>' + offerBanner(featured) : '') + newsletter();
     },
     orders() {
       const tab = state.ordersTab, open = ordersIn(), past = ordersPast();
       return header('Orders') + '<h1 class="h1">Orders</h1><div class="tabs"><button type="button" data-tab="progress" aria-pressed="' + (tab === 'progress') + '">In progress (' + open.length + ')</button><button type="button" data-tab="past" aria-pressed="' + (tab === 'past') + '">Past orders (' + past.length + ')</button></div>' +
         (tab === 'progress' ? (open.length ? open.map(orderRow).join('') : '<p class="note c">No open orders.</p>') : (past.length ? past.map(pastRow).join('') : '<p class="note c">No past orders yet.</p>')) +
-        duo() + collector();
+        duo();
+    },
+    collector(ref) {
+      const t = tierInfo(), c = C.collector;
+      const cards = c.tiers.map(x => {
+        const mine = x.id === t.tier.id, isNext = t.next && x.id === t.next.id;
+        return '<div class="tcard' + (mine ? ' mine' : '') + '"><p class="when' + (mine ? ' now' : '') + '">' + (mine ? 'Your tier' : isNext ? 'Next tier' : '&nbsp;') + '</p><h2 class="h2">' + esc(x.name) + '</h2><p class="note">' + esc(x.requirement) + '</p><ul>' + x.benefits.map(bn => '<li>' + esc(bn) + '</li>').join('') + '</ul></div>';
+      }).join('');
+      return header('Collector Status') + '<h1 class="h1">Collector status</h1><p class="lede">Our thanks to the partners who carry our work. The more you stock with us, the earlier you see new designs and the more we do together.</p>' +
+        '<div class="status wide"><p class="eye">You are</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) + '<p class="note">' + esc(t.line) + '</p><p class="note">' + t.count + ' shipped order' + (t.count === 1 ? '' : 's') + ' in the last 12 months.</p></div>' +
+        '<h3 class="h3" id="benefits">Tiers and benefits</h3><div class="tiers">' + cards + '</div>' +
+        '<h3 class="h3" id="how">How tiers work</h3><ul class="rules">' + c.rules.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul>' +
+        '<p class="note" style="margin-top:20px">Questions about your tier? Write to <a href="mailto:' + esc(C.shop.contactEmail) + '">' + esc(C.shop.contactEmail) + '</a>.</p>';
     },
     order(ref) {
       const o = state.buyer.orders.find(x => x.name.replace('#', '') === ref);
@@ -122,10 +161,11 @@
     const [page, ref] = h.split('/');
     let html;
     if (page === 'orders' && ref) html = pages.order(decodeURIComponent(ref));
-    else html = (pages[page] || pages.home)();
+    else html = (pages[page] || pages.home)(ref);
     root.innerHTML = '<div class="pg">' + html + '</div>';
-    const cur = page || 'home';
-    document.title = (cur.charAt(0).toUpperCase() + cur.slice(1)) + ' · ' + C.shop.name + ' Wholesale';
+    if (page === 'collector' && ref) { const el = document.getElementById(ref); if (el) el.scrollIntoView(); }
+    const names = { home: 'Home', orders: 'Orders', collector: 'Collector Status', offers: 'Offers', faq: 'Questions' };
+    document.title = (names[page] || 'Home') + ' · ' + C.shop.name + ' Wholesale';
   }
 
   async function start() {
@@ -146,7 +186,7 @@
   }
 
   // ---------- events ----------
-  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+  window.addEventListener('hashchange', () => { window.scrollTo(0, 0); render(); });
   document.addEventListener('click', e => {
     const a = e.target.closest('[data-act]');
     if (a && a.dataset.act === 'signin') window.PortalAuth.signIn().catch(err => { root.innerHTML = signInPage(err.message); });
