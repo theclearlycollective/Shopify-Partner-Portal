@@ -104,7 +104,15 @@ a.row:hover .id{border-bottom-color:var(--ink)}
 .tcard ul{list-style:none;margin:0;padding:0;border-top:1px solid rgba(27,27,31,.16);font-size:15.5px}
 .tcard li{padding:9px 0;border-bottom:1px solid rgba(27,27,31,.10)}
 #benefits{scroll-margin-top:20px}
+/* Recently ordered thumbnails */
+.minis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.mini{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit}
+.mini img{width:100%;aspect-ratio:1;object-fit:cover;background:#E6E1D6;display:block;margin-bottom:4px}
+.mini .mt{font-size:13.5px;line-height:1.3}
+.mini .md{font-family:var(--sans);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#625E58}
+.mini:hover .mt{text-decoration:underline}
 @media(max-width:680px){
+  .minis{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hero,.tiers{grid-template-columns:minmax(0,1fr)}
   .pg{padding:24px 16px 56px}.h1{font-size:34px}
   .drops,.duo,.col .grid,.ban{grid-template-columns:minmax(0,1fr)}

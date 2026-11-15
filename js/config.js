@@ -114,7 +114,7 @@ window.PORTAL_CONFIG = {
     { eyebrow: 'Holiday', title: 'Free freight through Nov 15',
       text: 'On orders over $1,500. A thank you for starting your holiday season with us.',
       note: 'Applied when your order is approved.',
-      image: 'https://cdn.shopify.com/s/files/1/0666/9628/2394/files/TCC_Block_Island_Studio.png?v=1787285655',
+      image: 'https://cdn.shopify.com/s/files/1/0666/9628/2394/files/DSCF0927_1.jpg?v=1787939998',
       link: '', featured: true },
     { eyebrow: 'Gifting', title: '5% off gift boxing',
       text: 'On gift-boxed pieces in orders placed by Nov 1.',

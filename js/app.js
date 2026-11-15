@@ -39,6 +39,23 @@
     return '<div class="ban">' + img(o.image, o.title) + body + '</div>';
   }
 
+  // Small pictures of the items this partner ordered most recently.
+  function recentStrip() {
+    const seen = new Set(), tiles = [];
+    for (const o of state.buyer.orders) {
+      for (const i of o.items) {
+        const k = i.variantId || i.title;
+        if (seen.has(k) || !i.image) continue;
+        seen.add(k);
+        tiles.push('<a class="mini" href="#/orders/' + encodeURIComponent(o.name.replace('#', '')) + '"><img src="' + esc(i.image) + '" alt="" loading="lazy"><span class="mt">' + esc(i.title) + '</span><span class="md">' + i.qty + ' in ' + esc(o.name) + ' · ' + date(o.date) + '</span></a>');
+        if (tiles.length === 6) break;
+      }
+      if (tiles.length === 6) break;
+    }
+    if (!tiles.length) return '';
+    return '<h3 class="h3">Recently ordered</h3><div class="minis">' + tiles.join('') + '</div>';
+  }
+
   // ---------- sections ----------
   function dropsSection() {
     if (!state.drops) return '<p class="eye c">What’s new in the studio</p><p class="note c">Loading the latest drops…</p>';
@@ -103,13 +120,13 @@
       return header('Home') + '<div class="hero"><div class="who"><p class="eye">Welcome back</p><h1 class="h1 left">' + esc(b.company) + '</h1><p class="partner left">Exclusive partner of The Clearly Collective</p>' + (b.place ? '<p class="place">' + esc(b.place) + '</p>' : '') + '</div>' + statusCard() + '</div>' +
         '<dl class="facts"><div><dt>Open orders</dt><dd>' + open.length + '</dd></div><div><dt>Last order</dt><dd>' + (last ? date(last.date) : '—') + '</dd></div><div><dt>Orders to date</dt><dd>' + b.orders.length + '</dd></div></dl>' +
         '<div class="gap">' + dropsSection() + '</div>' +
-        '<h3 class="h3">In progress</h3>' + (open.length ? open.map(orderRow).join('') : '<p class="note">No open orders right now.</p>') +
+        recentStrip() + '<h3 class="h3">In progress</h3>' + (open.length ? open.map(orderRow).join('') : '<p class="note">No open orders right now.</p>') +
         duo() +
         (featured ? '<h3 class="h3">For you</h3>' + offerBanner(featured) : '') + newsletter();
     },
     orders() {
       const tab = state.ordersTab, open = ordersIn(), past = ordersPast();
-      return header('Orders') + '<h1 class="h1">Orders</h1><div class="tabs"><button type="button" data-tab="progress" aria-pressed="' + (tab === 'progress') + '">In progress (' + open.length + ')</button><button type="button" data-tab="past" aria-pressed="' + (tab === 'past') + '">Past orders (' + past.length + ')</button></div>' +
+      return header('Orders') + '<h1 class="h1">Orders</h1>' + recentStrip() + '<div class="tabs" style="margin-top:34px"><button type="button" data-tab="progress" aria-pressed="' + (tab === 'progress') + '">In progress (' + open.length + ')</button><button type="button" data-tab="past" aria-pressed="' + (tab === 'past') + '">Past orders (' + past.length + ')</button></div>' +
         (tab === 'progress' ? (open.length ? open.map(orderRow).join('') : '<p class="note c">No open orders.</p>') : (past.length ? past.map(pastRow).join('') : '<p class="note c">No past orders yet.</p>')) +
         duo();
     },
