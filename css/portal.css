@@ -83,22 +83,27 @@ a.row:hover .id{border-bottom-color:var(--ink)}
 .who .eye{margin-bottom:6px}
 .h1.left,.partner.left{text-align:left}.h1.left{margin:0 0 6px}.partner.left{margin:0 0 4px}
 .place{font-family:var(--disp);font-size:20px;color:#3C3A37}
-.status{background:var(--panel);border:1px solid var(--ink);padding:24px 26px;display:flex;flex-direction:column;gap:10px}
-.status .eye{margin:0}
-.tier{font-family:var(--disp);font-size:30px;line-height:1.1}
-.bar{display:grid;gap:4px;margin-top:4px}.seg{height:4px;background:#CFC8BC}.seg.on{background:var(--ink)}
+.status{position:relative;background:#EFE7DA;padding:30px 32px 26px;display:flex;flex-direction:column;gap:10px;outline:1px solid rgba(27,27,31,.22);outline-offset:-10px}
+.status .eye{margin:0;color:#5A564F}
+.status .num,.tcard .num{font-family:var(--disp);font-size:44px;line-height:1;color:rgba(27,27,31,.16)}
+.status .num{position:absolute;top:22px;right:28px}
+.tier{font-family:var(--disp);font-size:32px;line-height:1.1}
+.bar{display:grid;gap:5px;margin-top:6px}.seg{height:2px;background:rgba(27,27,31,.18)}.seg.on{background:var(--ink)}
+.status .note{color:#4F4B45}
 .status .links{display:flex;flex-wrap:wrap;gap:22px;margin-top:4px}
 .status .links .link{padding-top:14px;display:inline-block}
 .status.wide{max-width:560px;margin:0 auto}
 /* Collector Status page */
-.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.tcard{border:1px solid var(--line);background:var(--panel);padding:22px 22px 18px}
-.tcard.mine{border-color:var(--ink)}
-.tcard .h2{margin:2px 0 4px}
-.tcard ul,.rules{margin:14px 0 0;padding-left:18px;font-size:15.5px}
-.tcard li,.rules li{margin-bottom:6px}
-.rules{max-width:60ch}
-#benefits,#how{scroll-margin-top:20px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.tcard{background:#F6F2EC;padding:26px 26px 22px}
+.tcard.mine{background:#EFE7DA;outline:1px solid rgba(27,27,31,.22);outline-offset:-10px}
+.tcard .thead{display:flex;justify-content:space-between;align-items:flex-start;min-height:44px}
+.tcard .when.now{color:#6B5022}.tcard .when{color:#5A564F}
+.tcard .h2{margin:14px 0 4px}
+.tcard .req{font-size:15px;color:#4F4B45;font-style:italic;margin:0 0 14px}
+.tcard ul{list-style:none;margin:0;padding:0;border-top:1px solid rgba(27,27,31,.16);font-size:15.5px}
+.tcard li{padding:9px 0;border-bottom:1px solid rgba(27,27,31,.10)}
+#benefits{scroll-margin-top:20px}
 @media(max-width:680px){
   .hero,.tiers{grid-template-columns:minmax(0,1fr)}
   .pg{padding:24px 16px 56px}.h1{font-size:34px}

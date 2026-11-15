@@ -74,10 +74,10 @@
       if (need) parts.push(left + ' more shipped order' + (left === 1 ? '' : 's'));
       if (c.atelierMinSpend) parts.push(money({ amount: Math.max(c.atelierMinSpend - spend, 0), currencyCode: 'USD' }) + ' more in orders');
       line = (parts.length ? parts.join(' or ') : 'A little more') + ' to reach ' + next.name.replace(' Partner', '');
-      return { tier, next, count, spend, segments: need || 3, filled, line };
+      return { tier, next, idx, count, spend, segments: need || 3, filled, line };
     }
     if (id === 'atelier') line = 'Keystone partners are invited by our team' + (c.keystoneSpendHint ? ', usually after ' + money({ amount: c.keystoneSpendHint, currencyCode: 'USD' }) + ' in a year' : '') + '.';
-    return { tier, next, count, spend, segments: 3, filled, line };
+    return { tier, next, idx, count, spend, segments: 3, filled, line };
   }
   function progressBar(t) {
     let bars = '';
@@ -86,13 +86,12 @@
   }
   function statusCard() {
     const t = tierInfo();
-    return '<div class="status"><p class="eye">Collector status</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) +
-      '<p class="note">' + esc(t.line) + '</p><div class="links"><a class="link" href="#/collector">Your benefits</a><a class="link" href="#/collector/how">How tiers work</a></div></div>';
+    return '<div class="status"><span class="num" aria-hidden="true">0' + (t.idx + 1) + '</span><p class="eye">Collector status</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) +
+      '<p class="note">' + esc(t.line) + '</p><div class="links"><a class="link" href="#/collector">Your benefits</a></div></div>';
   }
   function newsletter() {
-    return '<form class="news" id="news"><p class="eye c">Partner newsletter</p><h2 class="h2 c">Hear about what matters to your shop</h2><p class="note">Choose what you want to hear about.</p><div class="opts">' +
-      C.newsletter.topics.map((t, i) => '<label><input type="checkbox" name="topic" value="' + esc(t) + '"' + (i < 2 ? ' checked' : '') + '> ' + esc(t) + '</label>').join('') +
-      '</div><div class="frm"><label class="sr" for="nemail">Email</label><input id="nemail" type="email" required value="' + esc(state.buyer.email) + '"><button class="btn s" type="submit">Sign up</button></div><p class="note" id="newsmsg" role="status"></p></form>';
+    return '<form class="news" id="news"><p class="eye c">Partner newsletter</p><h2 class="h2 c">Hear about what matters to your shop</h2><p class="note">New drops, offers and studio news for our retail partners.</p>' +
+      '<div class="frm" style="margin-top:18px"><label class="sr" for="nemail">Email</label><input id="nemail" type="email" required value="' + esc(state.buyer.email) + '"><button class="btn s" type="submit">Sign up</button></div><p class="note" id="newsmsg" role="status"></p></form>';
   }
 
   // ---------- pages ----------
@@ -116,14 +115,13 @@
     },
     collector(ref) {
       const t = tierInfo(), c = C.collector;
-      const cards = c.tiers.map(x => {
+      const cards = c.tiers.map((x, i) => {
         const mine = x.id === t.tier.id, isNext = t.next && x.id === t.next.id;
-        return '<div class="tcard' + (mine ? ' mine' : '') + '"><p class="when' + (mine ? ' now' : '') + '">' + (mine ? 'Your tier' : isNext ? 'Next tier' : '&nbsp;') + '</p><h2 class="h2">' + esc(x.name) + '</h2><p class="note">' + esc(x.requirement) + '</p><ul>' + x.benefits.map(bn => '<li>' + esc(bn) + '</li>').join('') + '</ul></div>';
+        return '<div class="tcard' + (mine ? ' mine' : '') + '"><div class="thead"><span class="num" aria-hidden="true">0' + (i + 1) + '</span><p class="when' + (mine ? ' now' : '') + '">' + (mine ? 'Your tier' : isNext ? 'Next tier' : '') + '</p></div><h2 class="h2">' + esc(x.name) + '</h2><p class="req">' + esc(x.requirement) + '</p><ul>' + x.benefits.map(bn => '<li>' + esc(bn) + '</li>').join('') + '</ul></div>';
       }).join('');
       return header('Collector Status') + '<h1 class="h1">Collector status</h1><p class="lede">Our thanks to the partners who carry our work. The more you stock with us, the earlier you see new designs and the more we do together.</p>' +
-        '<div class="status wide"><p class="eye">You are</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) + '<p class="note">' + esc(t.line) + '</p><p class="note">' + t.count + ' shipped order' + (t.count === 1 ? '' : 's') + ' in the last 12 months.</p></div>' +
+        '<div class="status wide"><span class="num" aria-hidden="true">0' + (t.idx + 1) + '</span><p class="eye">You are</p><p class="tier">' + esc(t.tier.name) + '</p>' + progressBar(t) + '<p class="note">' + esc(t.line) + '</p><p class="note">' + t.count + ' shipped order' + (t.count === 1 ? '' : 's') + ' in the last 12 months.</p></div>' +
         '<h3 class="h3" id="benefits">Tiers and benefits</h3><div class="tiers">' + cards + '</div>' +
-        '<h3 class="h3" id="how">How tiers work</h3><ul class="rules">' + c.rules.map(r => '<li>' + esc(r) + '</li>').join('') + '</ul>' +
         '<p class="note" style="margin-top:20px">Questions about your tier? Write to <a href="mailto:' + esc(C.shop.contactEmail) + '">' + esc(C.shop.contactEmail) + '</a>.</p>';
     },
     order(ref) {
@@ -198,7 +196,7 @@
     if (e.target.id !== 'news') return;
     e.preventDefault();
     const msg = $('#newsmsg');
-    const topics = [...e.target.querySelectorAll('input[name=topic]:checked')].map(i => i.value);
+    const topics = [];
     msg.textContent = 'Signing you up…';
     try { await window.PortalData.subscribe($('#nemail').value, topics); msg.textContent = 'You’re signed up. Thank you.'; }
     catch (err) { msg.textContent = err.message; }

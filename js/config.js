@@ -93,12 +93,6 @@ window.PORTAL_CONFIG = {
           'First look at prints before they retire to the Archive',
           'An exclusive design or colorway for your store or city', 'An in-store event or trunk show with Olivia',
           'Payment terms and a dedicated contact', 'Named founding stockist of new city designs'] }
-    ],
-    rules: [
-      'Your tier is based on shipped orders over the last 12 months.',
-      'Once you reach a tier, you keep it for 12 months, even if a season is slower.',
-      'Keystone partners are invited by our team.',
-      'Benefits apply from your next order after you reach a tier.'
     ]
   },
 
@@ -120,7 +114,7 @@ window.PORTAL_CONFIG = {
     { eyebrow: 'Holiday', title: 'Free freight through Nov 15',
       text: 'On orders over $1,500. A thank you for starting your holiday season with us.',
       note: 'Applied when your order is approved.',
-      image: 'https://cdn.shopify.com/s/files/1/0666/9628/2394/collections/IMG_5074.jpg?v=1744288856',
+      image: 'https://cdn.shopify.com/s/files/1/0666/9628/2394/files/TCC_Block_Island_Studio.png?v=1787285655',
       link: '', featured: true },
     { eyebrow: 'Gifting', title: '5% off gift boxing',
       text: 'On gift-boxed pieces in orders placed by Nov 1.',

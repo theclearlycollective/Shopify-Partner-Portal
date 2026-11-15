@@ -18,6 +18,10 @@ It is a plain website (HTML, CSS and JavaScript). No server, no build step, no m
 | `js/app.js` | The pages and navigation |
 | `js/demo.js` | Sample orders shown while `demoMode` is on |
 
+## Updating files
+
+After uploading changed files, open `index.html` on GitHub and change every `?v=4` to the next number (`?v=5`, and so on). This makes browsers load the new files instead of saved copies.
+
 ## 1. Put it on GitHub
 
 1. Create a new repository, for example `TCC-Wholesale-Portal`.
