@@ -5,8 +5,8 @@
 // NEVER put a Shopify Admin API token or a Klaviyo private key in this file.
 // ============================================================================
 window.PORTAL_CONFIG = {
-  // While true, the portal shows sample orders so you can preview it before
-  // Shopify sign-in is set up. Set to false once the steps in README.md are done.
+  // STEP 3: change to false to switch on real Shopify sign-in.
+  // While true, the portal shows sample orders.
   demoMode: true,
 
   shop: {
@@ -15,8 +15,8 @@ window.PORTAL_CONFIG = {
     siteUrl: 'https://www.theclearlycollective.com',
     // Domain for the Storefront API. If requests fail, use your
     // xxxx.myshopify.com domain instead (Settings > Domains in Shopify admin).
-    storefrontDomain: 'www.theclearlycollective.com',
-    // Headless sales channel > Storefront API > Public access token.
+    storefrontDomain: 'the-clearly-collective.myshopify.com',
+    // STEP 1: paste the Public access token from Headless > Storefront API.
     storefrontToken: '',
     apiVersion: '2026-10',
     contactEmail: 'wholesale@theclearlycollective.com'
@@ -25,13 +25,14 @@ window.PORTAL_CONFIG = {
   // Shopify customer sign-in (Customer Account API, public client).
   // Headless sales channel > Customer Account API settings.
   customerAccount: {
+    // STEP 2: paste the Client ID from Headless > Customer Account API.
     clientId: '',
     // Numeric shop ID shown in the Customer Account API settings.
     // Only used if automatic endpoint discovery fails.
-    shopId: '',
+    shopId: '66696282394',
     // Must exactly match the Callback URI registered in Shopify.
     // Leave blank to use this page's own address.
-    redirectUri: ''
+    redirectUri: 'https://theclearlycollective.github.io/Shopify-Partner-Portal/'
   },
 
   // Who may use the portal. 'none' lets any signed-in customer in.

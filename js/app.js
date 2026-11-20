@@ -187,6 +187,7 @@
     root.innerHTML = '<div class="narrow c" style="padding-top:120px">' + brand() + '<p class="note" style="margin-top:40px">Loading…</p></div>';
     try {
       if (!C.demoMode) {
+        if (!C.customerAccount.clientId) { root.innerHTML = signInPage('Setup not finished: add the Client ID in js/config.js.'); return; }
         await window.PortalAuth.handleCallback();
         if (!window.PortalAuth.isSignedIn()) { root.innerHTML = signInPage(); return; }
       }
