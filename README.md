@@ -20,7 +20,7 @@ It is a plain website (HTML, CSS and JavaScript). No server, no build step, no m
 
 ## Updating files
 
-After uploading changed files, open `index.html` on GitHub and change every `?v=7` to the next number (`?v=8`, and so on). This makes browsers load the new files instead of saved copies.
+After uploading changed files, open `index.html` on GitHub and change every `?v=8` to the next number (`?v=9`, and so on). This makes browsers load the new files instead of saved copies.
 
 ## 1. Put it on GitHub
 

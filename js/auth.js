@@ -1,8 +1,12 @@
 // Shopify customer sign-in using the Customer Account API (public client + PKCE).
 // Shopify hosts the sign-in page and emails the buyer a one-time code.
+// The sign-in is kept only for the current browser tab (sessionStorage), so a
+// partner has to sign in again with a new code each time they come back.
 (function () {
   const C = window.PORTAL_CONFIG;
   const KEY = 'tcc-portal-auth';
+  const STORE = sessionStorage;
+  try { localStorage.removeItem(KEY); } catch (e) { /* clear any older saved sign-in */ }
   const PENDING = 'tcc-portal-pending';
 
   function redirectUri() {
@@ -61,13 +65,13 @@
       idToken: t.id_token || (load() || {}).idToken || null,
       expires: now + ((t.expires_in || 3600) - 60) * 1000
     };
-    localStorage.setItem(KEY, JSON.stringify(s));
+    STORE.setItem(KEY, JSON.stringify(s));
     return s;
   }
   function load() {
-    try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; }
+    try { return JSON.parse(STORE.getItem(KEY)); } catch (e) { return null; }
   }
-  function clear() { localStorage.removeItem(KEY); }
+  function clear() { STORE.removeItem(KEY); }
 
   async function signIn() {
     const ep = await endpoints();
@@ -84,6 +88,9 @@
     u.searchParams.set('nonce', nonce);
     u.searchParams.set('code_challenge', await challengeFor(verifier));
     u.searchParams.set('code_challenge_method', 'S256');
+    // Ask Shopify to always show the email + code step, even if it remembers
+    // the customer from an earlier visit.
+    if (C.customerAccount.alwaysAskForCode !== false) u.searchParams.set('prompt', 'login');
     location.href = u.toString();
   }
 

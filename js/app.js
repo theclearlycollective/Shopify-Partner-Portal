@@ -165,8 +165,9 @@
     return '<div class="narrow c" style="padding-top:72px">' + brand() + '<h1 class="h1" style="margin-top:56px">Wholesale Portal</h1><p class="lede">Track your orders, see past orders, and reorder. Sign in with the email on your wholesale account and we will send you a one-time code.</p><button type="button" class="btn" data-act="signin">Sign in</button>' + (msg ? '<p class="err" role="alert">' + esc(msg) + '</p>' : '') + '<p class="note" style="margin-top:34px">New here? <a href="' + esc(C.applyUrl) + '" target="_blank" rel="noopener">Apply for a retail partnership</a>.</p></div>';
   }
   function notApprovedPage() {
-    return '<div class="narrow c" style="padding-top:72px">' + brand() + '<h1 class="h1" style="margin-top:56px">Almost there</h1><p class="lede">Your account is not approved for the partner portal yet. Approval usually follows your first wholesale order. Questions? Write to ' + esc(C.shop.contactEmail) + '.</p><button type="button" class="btn g" data-act="signout">Sign out</button></div>';
+    return '<div class="narrow c" style="padding-top:72px">' + brand() + '<h1 class="h1" style="margin-top:56px">This email isn’t approved yet</h1><p class="lede">The partner portal is open to approved retail partners only. To request access, please reach out to our team at <a href="mailto:' + esc(C.shop.contactEmail) + '?subject=Partner%20portal%20access">' + esc(C.shop.contactEmail) + '</a> and we’ll be in touch.</p><button type="button" class="btn g" data-act="signout">Sign out</button></div>';
   }
+
 
   // ---------- routing ----------
   function render() {

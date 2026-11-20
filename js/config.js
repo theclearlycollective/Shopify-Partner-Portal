@@ -5,9 +5,8 @@
 // NEVER put a Shopify Admin API token or a Klaviyo private key in this file.
 // ============================================================================
 window.PORTAL_CONFIG = {
-  // STEP 3: change to false to switch on real Shopify sign-in.
-  // While true, the portal shows sample orders.
-  demoMode: true,
+  // Real Shopify sign-in is on. Set to true to go back to the sample preview.
+  demoMode: false,
 
   shop: {
     name: 'The Clearly Collective',
@@ -16,8 +15,8 @@ window.PORTAL_CONFIG = {
     // Domain for the Storefront API. If requests fail, use your
     // xxxx.myshopify.com domain instead (Settings > Domains in Shopify admin).
     storefrontDomain: 'the-clearly-collective.myshopify.com',
-    // STEP 1: paste the Public access token from Headless > Storefront API.
-    storefrontToken: '',
+    // Storefront API public access token (Headless channel). Public by design.
+    storefrontToken: 'b45576b1e42388374bb42e91a07181b9',
     apiVersion: '2026-10',
     contactEmail: 'wholesale@theclearlycollective.com'
   },
@@ -25,20 +24,23 @@ window.PORTAL_CONFIG = {
   // Shopify customer sign-in (Customer Account API, public client).
   // Headless sales channel > Customer Account API settings.
   customerAccount: {
-    // STEP 2: paste the Client ID from Headless > Customer Account API.
-    clientId: '',
+    // Customer Account API Client ID (Headless channel). Public by design.
+    clientId: '768dc669-0b3b-4927-a893-1305545cd0cc',
     // Numeric shop ID shown in the Customer Account API settings.
     // Only used if automatic endpoint discovery fails.
     shopId: '66696282394',
     // Must exactly match the Callback URI registered in Shopify.
     // Leave blank to use this page's own address.
-    redirectUri: 'https://theclearlycollective.github.io/Shopify-Partner-Portal/'
+    redirectUri: 'https://theclearlycollective.github.io/Shopify-Partner-Portal/',
+    // Partners enter a new email code every visit. If sign-in shows an error
+    // about "prompt", set this to false.
+    alwaysAskForCode: true
   },
 
   // Who may use the portal. 'none' lets any signed-in customer in.
   // 'metafield' only lets in customers whose metafield below is "true".
   // See README > Approval before switching this on.
-  approval: { mode: 'none', namespace: 'portal', key: 'approved' },
+  approval: { mode: 'metafield', namespace: 'portal', key: 'approved' },
 
   // "What's new in the studio". Each entry is a Shopify collection handle,
   // so photos and pieces update automatically from your catalog.
